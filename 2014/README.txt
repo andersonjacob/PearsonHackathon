@@ -1,1 +1,1 @@
-A simple histogramming helper tool using matplotlib and pandas.
+A simple histogramming helper tool using matplotlib and numpy.
