@@ -49,7 +49,7 @@ trialsPerErr = 100
 student_resp = lambda e: int(np.random.random() + 1 - e)
 
 recommender = rec.Recommendations()
-minErr = args.minErr
+minErr = args.minErr*kc_stats['sd']
 
 output_fields = ['errRate', 'minErr', 'mastered',
           'prob', 'tries', 'skill', 'skill_err']
@@ -57,7 +57,7 @@ out_str = ','.join(['{' + key + '}' for key in output_fields])
 output = { key : None for key in output_fields }
 
 for im in args.mults:
-    output_file = open('studentSimulator_mult{0}_min{1}.csv'.format(im,
+    output_file = open('studentSimulator_mult{0}_min{1:.2f}.csv'.format(im,
                                                                     minErr),
                        'w')
     output_file.write(','.join([x for x in output_fields]) + '\n')

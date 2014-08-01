@@ -3,23 +3,17 @@ import matplotlib.pyplot as plt
 class histogrammer(object):
 
     def __init__(self, **kwargs):
-        self.setParameter('nbins', kwargs)
-        self.setParameter('range', kwargs)
-        self.setParameter('bins', kwargs)
+        self.check_for = ('range','bins','color','histtype',
+                          'label','facecolor','edgecolor','normed',
+                          'cumulative','alpha','BLAH','nbins','title',
+                          'xlabel','ylabel')
+        for kwarg in self.check_for:
+            self.setParameter(kwarg,kwargs)
         if hasattr(self, 'bins'):
             self.range = (self.bins[0], self.bins[-1])
             self.nbins = len(self.bins)-1
         if not hasattr(self, 'bins') and hasattr(self, 'nbins'):
             self.bins = self.nbins
-        self.setParameter('title', kwargs)
-        self.setParameter('xlabel', kwargs)
-        self.setParameter('ylabel', kwargs)
-        self.setParameter('alpha', kwargs)
-        self.setParameter('color', kwargs)
-        self.setParameter('histtype', kwargs)
-        self.setParameter('label', kwargs)
-        self.setParameter('facecolor', kwargs)
-        self.setParameter('edgecolor', kwargs)
 
     def setParameter(self, pname, kwargs):
         try:
@@ -35,16 +29,19 @@ class histogrammer(object):
         return kwargs
 
     def fillHist(self, data, columnName = None):
-        possible_kwargs = ('bins', 'range', 'alpha', 'color', 'histtype',
-                           'label', 'facecolor', 'edgecolor')
+        possible_kwargs = self.check_for[0:self.check_for.index('BLAH')]
         kwargs = {}
         for pname in possible_kwargs:
             kwargs = self.addToDict(pname, kwargs)
-        self.fig = plt.figure()
+        # self.fig = plt.figure()
 
         if columnName:
             data = data[columnName]
 
+        if len(data) < 1:
+            return None
+
+        # print kwargs
         self.counts, self.h_bins, self.patches = plt.hist(data, **kwargs)
 
         if hasattr(self, 'range'):
@@ -65,7 +62,7 @@ class histogrammer(object):
                 '{0} / ({1:.3g})'.format(self.ylabel, bw),
                 ha='right', position = (1,1))
 
-        return self.fig
+        return self.patches[0].axes.get_figure()
 
 if __name__ == '__main__':
     import numpy as np
@@ -77,6 +74,6 @@ if __name__ == '__main__':
                          color='g', alpha=0.75, xlabel='x',
                          ylabel='counts', title='std nrm dist')
     
-    fig = histo.fillHist(data)
+    histo.fillHist(data)
 
     plt.show()
