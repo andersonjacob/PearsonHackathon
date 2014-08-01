@@ -28,8 +28,10 @@ class histogrammer(object):
             pass
 
     def addToDict(self, pname, kwargs):
-        if hasattr(self, pname):
+        try:
             kwargs[pname] = getattr(self, pname)
+        except AttributeError:
+            pass
         return kwargs
 
     def fillHist(self, data, columnName = None):
@@ -39,19 +41,29 @@ class histogrammer(object):
         for pname in possible_kwargs:
             kwargs = self.addToDict(pname, kwargs)
         self.fig = plt.figure()
+
+        if columnName:
+            data = data[columnName]
+
         self.counts, self.h_bins, self.patches = plt.hist(data, **kwargs)
 
         if hasattr(self, 'range'):
             self.patches[0].axes.set_xlim( self.range )
-        possible_setters = ('title', 'xlabel')
+        possible_setters = ('title', )
         for setter in possible_setters:
-            if hasattr(self, setter):
+            try:
                 getattr(self.patches[0].axes, 'set_{0}'.format(setter))(
                     getattr(self, setter))
+            except AttributeError:
+                pass
+        if hasattr(self, 'xlabel'):
+            self.patches[0].axes.set_xlabel(self.xlabel, ha='right',
+                                            position = (1,1))
         if hasattr(self, 'ylabel'):
             bw = (self.range[1]-self.range[0])/float(self.nbins)
             self.patches[0].axes.set_ylabel(
-                '{0} / ({1:.3g})'.format(self.ylabel, bw))
+                '{0} / ({1:.3g})'.format(self.ylabel, bw),
+                ha='right', position = (1,1))
 
         return self.fig
 
