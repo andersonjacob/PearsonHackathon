@@ -3,11 +3,12 @@ import matplotlib.pyplot as plt
 class histogrammer(object):
 
     def __init__(self, **kwargs):
-        self.check_for = ('range','bins','color','histtype',
+        self.hist_kw = ('range','bins','color','histtype',
                           'label','facecolor','edgecolor','normed',
-                          'cumulative','alpha','BLAH','nbins','title',
-                          'xlabel','ylabel')
-        for kwarg in self.check_for:
+                          'cumulative','alpha','figure')
+        self.axis_set_kw = ('title', )
+        self.other_kw = ('nbins','xlabel','ylabel')
+        for kwarg in self.hist_kw + self.axis_set_kw + self.other_kw:
             self.setParameter(kwarg,kwargs)
         if hasattr(self, 'bins'):
             self.range = (self.bins[0], self.bins[-1])
@@ -29,9 +30,8 @@ class histogrammer(object):
         return kwargs
 
     def fillHist(self, data, columnName = None):
-        possible_kwargs = self.check_for[0:self.check_for.index('BLAH')]
         kwargs = {}
-        for pname in possible_kwargs:
+        for pname in self.hist_kw:
             kwargs = self.addToDict(pname, kwargs)
         # self.fig = plt.figure()
 
@@ -42,12 +42,16 @@ class histogrammer(object):
             return None
 
         # print kwargs
+        try:
+            data.reset_index(drop=True, inplace=True)
+        except AttributeError:
+            pass
+        # print data.head()
         self.counts, self.h_bins, self.patches = plt.hist(data, **kwargs)
 
         if hasattr(self, 'range'):
             self.patches[0].axes.set_xlim( self.range )
-        possible_setters = ('title', )
-        for setter in possible_setters:
+        for setter in self.axis_set_kw:
             try:
                 getattr(self.patches[0].axes, 'set_{0}'.format(setter))(
                     getattr(self, setter))
@@ -76,4 +80,15 @@ if __name__ == '__main__':
     
     histo.fillHist(data)
 
+    wsum = 0.
+    vsum = 0.
+    print histo.h_bins
+    print histo.counts
+    for i in range(histo.counts.argmax()-2, histo.counts.argmax()+3):
+        bincenter = 0.5*(histo.h_bins[i] + histo.h_bins[i+1])
+        print i,histo.counts[i], histo.h_bins[i],bincenter
+        wsum += histo.counts[i]
+        vsum += bincenter*histo.counts[i]
+
+    print 'mode:', vsum/wsum
     plt.show()
