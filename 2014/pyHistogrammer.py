@@ -4,8 +4,8 @@ class histogrammer(object):
 
     def __init__(self, **kwargs):
         self.hist_kw = ('range','bins','color','histtype',
-                          'label','facecolor','edgecolor','normed',
-                          'cumulative','alpha','figure')
+                        'label','facecolor','edgecolor','normed',
+                        'cumulative','alpha','figure')
         self.axis_set_kw = ('title', )
         self.other_kw = ('nbins','xlabel','ylabel')
         for kwarg in self.hist_kw + self.axis_set_kw + self.other_kw:
@@ -61,7 +61,10 @@ class histogrammer(object):
             self.patches[0].axes.set_xlabel(self.xlabel, ha='right',
                                             position = (1,1))
         if hasattr(self, 'ylabel'):
-            bw = (self.range[1]-self.range[0])/float(self.nbins)
+            try:
+                bw = (self.range[1]-self.range[0])/float(self.nbins)
+            except (AttributeError, TypeError):
+                bw = (self.h_bins[-1]-self.h_bins[0])/float(len(self.h_bins))
             self.patches[0].axes.set_ylabel(
                 '{0} / ({1:.3g})'.format(self.ylabel, bw),
                 ha='right', position = (1,1))
