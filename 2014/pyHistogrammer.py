@@ -85,13 +85,13 @@ if __name__ == '__main__':
 
     wsum = 0.
     vsum = 0.
-    print histo.h_bins
-    print histo.counts
+    print(histo.h_bins)
+    print(histo.counts)
     for i in range(histo.counts.argmax()-2, histo.counts.argmax()+3):
         bincenter = 0.5*(histo.h_bins[i] + histo.h_bins[i+1])
-        print i,histo.counts[i], histo.h_bins[i],bincenter
+        print('{} {} {}'.format(i,histo.counts[i], histo.h_bins[i],bincenter))
         wsum += histo.counts[i]
         vsum += bincenter*histo.counts[i]
 
-    print 'mode:', vsum/wsum
+    print('mode: {}'.format(vsum/wsum))
     plt.show()
